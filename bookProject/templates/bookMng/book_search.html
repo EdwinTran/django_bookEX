@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-   My Books
+   Book Search
 {% endblock title %}
 
 
@@ -26,7 +26,7 @@
         <a class="nav-link" href="/requestbook">Request Books</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/displayrequest">Requested Books</a>
+        <a class="nav-link" href="/book_search">Book Search</a>
       </li>
       <!-- ## Jason END ## -->
     </ul>
@@ -40,24 +40,21 @@
     {% endif %}
   </div>
 </nav>
-<h1 align="center"> My Books Page </h1>
-<table align="center" width="50%">
-    {% for book in books %}
-        <tr style="border-bottom: 2px solid black">
-            <td style="padding-bottom: 15px; padding-top: 15px; padding-right: 20px;">
-                <a href="book_detail/{{ book.id }}">
-                    <img src="{% static book.pic_path %}" width="175" height="250">
-                </a>
-            </td>
-            <td align="center">
-                <a href="book_detail/{{ book.id }}">
-                    {{ book.name }}
-                </a><br>
-                <b>${{ book.price }}</b><br>
-                <b><a href="book_delete/{{ book.id }}">Delete Book</a></b>
-            </td>
-        </tr>
-    {% endfor %}
-    <a href="/">Back</a>
-</table>
+<h1 align="center"> Search Page </h1>
+{% if submitted %}
+<p>Success</p>
+{% else %}
+<form action="" enctype="multipart/form-data" method="post" novalidate>
+   <table>
+      {{ form.as_table }}
+      <tr>
+         <td colspan="2">
+            <input type="submit" value="Submit">
+         </td>
+      </tr>
+   </table>
+   {% csrf_token %}
+</form>
+{% endif %}
+<a href="/">Back</a>
 {% endblock content %}

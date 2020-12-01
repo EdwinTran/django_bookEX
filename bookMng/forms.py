@@ -30,12 +30,16 @@ class BookForm(ModelForm):
         ]
 
 
-class SearchForm(ModelForm):
+class SearchForm(forms.ModelForm):
     class Meta:
         model = Book
         fields = [
             'name',
         ]
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'Search'})
+        }
+
 
 
 class ReviewForm(ModelForm):
@@ -62,6 +66,7 @@ class UserCreationForm(UserCreationForm):
             user.save()
         return user
 
+
 class MessageForm(ModelForm):
     class Meta:
         model = Message
@@ -70,3 +75,20 @@ class MessageForm(ModelForm):
             'subject',
             'message'
         ]
+        widgets = {
+            'receiver': forms.Select(
+                attrs={
+                    'class': 'form-control'
+                }
+            ),
+            'subject': forms.TextInput(
+                attrs={
+                    'class': 'form-control'
+                }
+            ),
+            'message': forms.Textarea(
+                attrs={
+                    'class': 'form-control'
+                }
+            )
+        }
