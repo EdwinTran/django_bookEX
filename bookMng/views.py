@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from .models import MainMenu
 from .models import Book, RequestBook
 from .forms import RequestBookForm
@@ -52,12 +54,12 @@ def displaybooks(request):
 
 @login_required(login_url=reverse_lazy('login'))
 def book_search(request):
-    if request.method == 'POST':
-        form = SearchForm(request.POST, request.FILES)
-        if form.is_valid():
-            data = form.cleaned_data['name']
-            books = Book.objects.filter(name__icontains=data)
-            return books
+    query = request.POST.get('searchbar', '')
+    if query:
+        queryset = Q(name__icontains=query)
+        results = Book.objects.filter(queryset).distinct()
+        print(f'book_search: Returning results for {query}')
+        return results
     else:
        return Book.objects.all()
 
@@ -98,7 +100,7 @@ def postbook(request):
             except Exception:
                 pass
             book.save()
-            return HttpResponseRedirect('/postbook?submitted=True')
+            return HttpResponseRedirect('/displaybooks')
     else:
         form = BookForm()
         if 'submitted' in request.GET:
@@ -129,7 +131,7 @@ def requestbook(request):
         if form.is_valid():
             request_book = form.save(commit=False)
             request_book.save()
-            return HttpResponseRedirect('/requestbook?submitted=True')
+            return HttpResponseRedirect('/displayrequest')
     else:
         form = RequestBookForm()
         if 'submitted' in request.GET:
@@ -190,7 +192,7 @@ def contact(request):
     if request.method == "POST":
         newmessage = Message()
         post_username = request.POST['post-username']
-        subject = request.POST['message-book']
+        subject = request.POST['subject']
         message = request.POST['message']
 
         newmessage.sender = request.user
@@ -200,10 +202,10 @@ def contact(request):
 
         newmessage.save()
 
-        return render(request, 'bookMng/book_detail.html', {'message_name': newmessage.sender})
+        return render(request, 'bookMng/displaybooks.html',
+                      {'message_sender': newmessage.sender, 'message_receiver': newmessage.receiver})
     else:
-        return render(request, 'bookMng/book_detail.html', {})
-
+        return render(request, 'bookMng/displaybooks.html', {})
 
 @login_required(login_url=reverse_lazy('login'))
 def mymessages(request):
